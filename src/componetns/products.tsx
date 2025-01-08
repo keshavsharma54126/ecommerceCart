@@ -1,21 +1,22 @@
-import axios from 'axios'
-import { useEffect, useState } from 'react'
-import { useDispatch } from 'react-redux'
+
+import { useDispatch, useSelector } from 'react-redux'
 import { addToCart } from '../store/slices/cartSlice'
+import { RootState } from '../store/store'
+import { productStateEnum } from '../utils/productStateenum'
+import { useEffect } from 'react'
+import { fetchProductsAsync } from '../store/slices/productSlice'
 
 const Products = () => {
-    const [products, setProducts] = useState([])
+   const products = useSelector((state:RootState) => state.product.product)
     const dispatch = useDispatch()
-
+    const status = useSelector((state:RootState) => state.product.status)
     useEffect(() => {
-        const fetchProducts = async () => {
-            const response = await axios.get('https://fake-store-api.mock.beeceptor.com/api/products')
-            console.log(response.data)
-            setProducts(response.data)
-        }
-        fetchProducts()
-    }, [])
+        dispatch(fetchProductsAsync() as any)
+    }, [dispatch])
 
+    if(status === productStateEnum.LOADING){
+        return <div>Loading...</div>
+    }
     return (
         <div>
             <h1 className='text-2xl font-bold'>Products</h1>
